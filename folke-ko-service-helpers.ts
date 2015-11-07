@@ -86,6 +86,8 @@ interface MvcErrors{
 }
 
 function parseErrors(error:ResponseError) {
+    if (!error.response) return promise.Promise.resolve(errorMessages.unknownError);
+    
     switch (error.response.status) {
         case 401:
             return promise.Promise.resolve(errorMessages.unauthorized);
@@ -134,13 +136,11 @@ export var loading = ko.observable(false);
  * if the response has a status code that is not in the 200-300 range and
  * sets/unsets the loading boolean.
  */
-function fetchCommon(url: string, method: string, data: any) : Promise<Response> {
-    return window.fetch(url, {
-        method: method,
-        body: data != null ? JSON.stringify(data) : null,
-        credentials: 'same-origin'
-    }).then(response => {
-        this.loading(false);
+function fetchCommon(url: string, method: string, data: any): Promise<Response> {
+    var requestInit: RequestInit = { method: method, credentials: 'same-origin' };
+    if (data != null) requestInit.body = JSON.stringify(data);
+    return window.fetch(url, requestInit).then(response => {
+        loading(false);
         if (response.status >= 300 || response.status < 200) {
             var error = new ResponseError();
             error.response = response;
@@ -148,7 +148,7 @@ function fetchCommon(url: string, method: string, data: any) : Promise<Response>
         }
         return response;
     }, (error:ResponseError) => {
-        this.loading(false);
+        loading(false);
         parseErrors(error).then(showError);
         return error;
     });

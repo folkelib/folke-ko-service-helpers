@@ -78,6 +78,8 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
     })(Error);
     exports.ResponseError = ResponseError;
     function parseErrors(error) {
+        if (!error.response)
+            return promise.Promise.resolve(exports.errorMessages.unknownError);
         switch (error.response.status) {
             case 401:
                 return promise.Promise.resolve(exports.errorMessages.unauthorized);
@@ -124,13 +126,11 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
      * sets/unsets the loading boolean.
      */
     function fetchCommon(url, method, data) {
-        var _this = this;
-        return window.fetch(url, {
-            method: method,
-            body: data != null ? JSON.stringify(data) : null,
-            credentials: 'same-origin'
-        }).then(function (response) {
-            _this.loading(false);
+        var requestInit = { method: method, credentials: 'same-origin' };
+        if (data != null)
+            requestInit.body = JSON.stringify(data);
+        return window.fetch(url, requestInit).then(function (response) {
+            exports.loading(false);
             if (response.status >= 300 || response.status < 200) {
                 var error = new ResponseError();
                 error.response = response;
@@ -138,7 +138,7 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
             }
             return response;
         }, function (error) {
-            _this.loading(false);
+            exports.loading(false);
             parseErrors(error).then(exports.showError);
             return error;
         });
