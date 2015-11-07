@@ -1,0 +1,15 @@
+{
+  "name": "folke-ko-service-helpers",
+  "version": "1.0.0",
+  "description": "Helpers to call services",
+  "main": "folke-ko-service-helpers.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "tsc folke-ko-service-helpers.ts typings/tsd.d.ts --module amd"
+  },
+  "author": "Sidoine De Wispelaere",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "*"
+  }
+}
