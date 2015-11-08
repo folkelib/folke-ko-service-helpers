@@ -126,9 +126,16 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
      * sets/unsets the loading boolean.
      */
     function fetchCommon(url, method, data) {
-        var requestInit = { method: method, credentials: 'same-origin' };
+        var requestInit = {
+            method: method,
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        };
         if (data != null)
-            requestInit.body = JSON.stringify(data);
+            requestInit.body = data;
         return window.fetch(url, requestInit).then(function (response) {
             exports.loading(false);
             if (response.status >= 300 || response.status < 200) {

@@ -137,8 +137,15 @@ export var loading = ko.observable(false);
  * sets/unsets the loading boolean.
  */
 function fetchCommon(url: string, method: string, data: any): Promise<Response> {
-    var requestInit: RequestInit = { method: method, credentials: 'same-origin' };
-    if (data != null) requestInit.body = JSON.stringify(data);
+    var requestInit: RequestInit = {
+        method: method,
+        credentials: 'same-origin',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+    };
+    if (data != null) requestInit.body = data;
     return window.fetch(url, requestInit).then(response => {
         loading(false);
         if (response.status >= 300 || response.status < 200) {
