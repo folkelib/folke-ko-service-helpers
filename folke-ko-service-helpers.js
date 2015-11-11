@@ -89,6 +89,9 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
                 return promise.Promise.resolve(exports.errorMessages.internalServerError);
             default:
                 return error.response.json().then(function (value) {
+                    if (typeof value == "string") {
+                        return promise.Promise.resolve(value);
+                    }
                     return new Promise(function (resolve, reject) {
                         for (var _i = 0, _a = value[""].errors; _i < _a.length; _i++) {
                             var e = _a[_i];
@@ -104,6 +107,8 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
         if (parameters) {
             for (var key in parameters) {
                 var value = parameters[key];
+                if (value == undefined)
+                    continue;
                 if (value instanceof Date)
                     value = value.toISOString();
                 parametersList.push(key + '=' + encodeURIComponent(value));
@@ -139,8 +144,9 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
         return window.fetch(url, requestInit).then(function (response) {
             exports.loading(false);
             if (response.status >= 300 || response.status < 200) {
-                var error = new ResponseError();
+                var error = new ResponseError(response.statusText);
                 error.response = response;
+                parseErrors(error).then(exports.showError);
                 throw error;
             }
             return response;

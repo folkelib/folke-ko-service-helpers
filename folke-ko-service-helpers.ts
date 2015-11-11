@@ -96,13 +96,16 @@ function parseErrors(error:ResponseError) {
         case 500:
             return promise.Promise.resolve(errorMessages.internalServerError);
         default:
-            return error.response.json<MvcErrors>().then(value =>{
-                  return new Promise<string>((resolve, reject) => {
-                     for (let e of value[""].errors){
-                         resolve(e.errorMessage);
-                     } 
-                  });
-              });
+            return error.response.json<MvcErrors|string>().then(value => {
+                if (typeof value == "string") {
+                    return promise.Promise.resolve(value);
+                }
+                return new Promise<string>((resolve, reject) => {
+                    for (let e of value[""].errors){
+                        resolve(e.errorMessage);
+                    } 
+                });
+            });
     }
 }
 
@@ -150,8 +153,9 @@ function fetchCommon(url: string, method: string, data: any): Promise<Response> 
     return window.fetch(url, requestInit).then(response => {
         loading(false);
         if (response.status >= 300 || response.status < 200) {
-            var error = new ResponseError();
+            var error = new ResponseError(response.statusText);
             error.response = response;
+            parseErrors(error).then(showError);
             throw error;
         }
         return response;
