@@ -88,6 +88,8 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
             case 500:
                 return promise.Promise.resolve(exports.errorMessages.internalServerError);
             default:
+                if (!error.response.json)
+                    return promise.Promise.resolve(exports.errorMessages.unknownError);
                 return error.response.json().then(function (value) {
                     if (typeof value == "string") {
                         return promise.Promise.resolve(value);
@@ -139,6 +141,7 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
                 'Content-Type': 'application/json'
             }
         };
+        exports.loading(true);
         if (data != null)
             requestInit.body = data;
         return window.fetch(url, requestInit).then(function (response) {
@@ -153,7 +156,7 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
         }, function (error) {
             exports.loading(false);
             parseErrors(error).then(exports.showError);
-            return error;
+            throw error;
         });
     }
     /** Fetches an url that returns nothing */

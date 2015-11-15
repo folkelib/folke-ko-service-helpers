@@ -96,6 +96,8 @@ function parseErrors(error:ResponseError) {
         case 500:
             return promise.Promise.resolve(errorMessages.internalServerError);
         default:
+            if (!error.response.json) return promise.Promise.resolve(errorMessages.unknownError);
+            
             return error.response.json<MvcErrors|string>().then(value => {
                 if (typeof value == "string") {
                     return promise.Promise.resolve(value);
@@ -149,6 +151,7 @@ function fetchCommon(url: string, method: string, data: any): Promise<Response> 
             'Content-Type': 'application/json'
         },
     };
+    loading(true);
     if (data != null) requestInit.body = data;
     return window.fetch(url, requestInit).then(response => {
         loading(false);
@@ -162,7 +165,7 @@ function fetchCommon(url: string, method: string, data: any): Promise<Response> 
     }, (error:ResponseError) => {
         loading(false);
         parseErrors(error).then(showError);
-        return error;
+        throw error;
     });
 }
 
