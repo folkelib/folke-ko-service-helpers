@@ -77,6 +77,9 @@ export var showError = (error:string) => console.error(error);
 /** An error with the response that caused this error */
 export class ResponseError extends Error {
     response: Response
+    constructor(message:string) {
+        super(message);
+    }
 }
 
 interface MvcErrors{

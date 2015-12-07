@@ -71,8 +71,8 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
     /** An error with the response that caused this error */
     var ResponseError = (function (_super) {
         __extends(ResponseError, _super);
-        function ResponseError() {
-            _super.apply(this, arguments);
+        function ResponseError(message) {
+            _super.call(this, message);
         }
         return ResponseError;
     })(Error);
