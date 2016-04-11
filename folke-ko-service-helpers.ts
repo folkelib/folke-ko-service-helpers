@@ -85,7 +85,12 @@ export class ResponseError extends Error {
 interface MvcErrors{
     "": { errors: {
         errorMessage: string;
-    }[]}
+    }[]
+    } | string[]
+}
+
+function hasErrorMessage(error: any): error is { errors: { errorMessage: string }[] }{
+    return error.errors !== undefined;
 }
 
 function parseErrors(error:ResponseError) {
@@ -102,14 +107,21 @@ function parseErrors(error:ResponseError) {
             if (!error.response.json) return promise.Promise.resolve(errorMessages.unknownError);
             
             return error.response.json<MvcErrors|string>().then(value => {
-                if (typeof value == "string") {
+                if (typeof value === "string") {
                     return promise.Promise.resolve(value);
                 }
-                return new Promise<string>((resolve, reject) => {
-                    for (let e of value[""].errors){
-                        resolve(e.errorMessage);
-                    } 
-                });
+                else {
+                    return new Promise<string>((resolve, reject) => {
+                        var v = value[""];
+                        if (hasErrorMessage(v)) {
+                            var errors = v.errors.map(x => x.errorMessage).join("\n");
+                            resolve(errors);
+                        }
+                        else {
+                            resolve(v.join("\n"));
+                        }
+                    });
+                }
             });
     }
 }

@@ -17,6 +17,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 define(["require", "exports", "knockout", "es6-promise"], function (require, exports, ko, promise) {
+    "use strict";
     exports.errorMessages = {
         unauthorized: "Unauthorized access",
         internalServerError: "Internal server error",
@@ -75,8 +76,11 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
             _super.call(this, message);
         }
         return ResponseError;
-    })(Error);
+    }(Error));
     exports.ResponseError = ResponseError;
+    function hasErrorMessage(error) {
+        return error.errors !== undefined;
+    }
     function parseErrors(error) {
         if (!error.response)
             return promise.Promise.resolve(exports.errorMessages.unknownError);
@@ -91,15 +95,21 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
                 if (!error.response.json)
                     return promise.Promise.resolve(exports.errorMessages.unknownError);
                 return error.response.json().then(function (value) {
-                    if (typeof value == "string") {
+                    if (typeof value === "string") {
                         return promise.Promise.resolve(value);
                     }
-                    return new Promise(function (resolve, reject) {
-                        for (var _i = 0, _a = value[""].errors; _i < _a.length; _i++) {
-                            var e = _a[_i];
-                            resolve(e.errorMessage);
-                        }
-                    });
+                    else {
+                        return new Promise(function (resolve, reject) {
+                            var v = value[""];
+                            if (hasErrorMessage(v)) {
+                                var errors = v.errors.map(function (x) { return x.errorMessage; }).join("\n");
+                                resolve(errors);
+                            }
+                            else {
+                                resolve(v.join("\n"));
+                            }
+                        });
+                    }
                 });
         }
     }
@@ -139,7 +149,7 @@ define(["require", "exports", "knockout", "es6-promise"], function (require, exp
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            }
+            },
         };
         exports.loading(true);
         if (data != null)
