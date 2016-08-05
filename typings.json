@@ -1,0 +1,10 @@
+{
+  "name": "folke-ko-service-helpers",
+  "dependencies": {
+    "knockout": "registry:npm/knockout#3.4.0+20160516171930"
+  },
+  "globalDependencies": {
+    "promise": "github:Sidoine/promise",
+    "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20160728142841"
+  }
+}

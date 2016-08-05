@@ -13,7 +13,6 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.*/
 
 import * as ko from "knockout";
-import * as promise from "es6-promise";
 
 export var errorMessages ={
     unauthorized: "Unauthorized access",
@@ -25,7 +24,7 @@ export var errorMessages ={
 /** An object whose value may have changed since an initial value */
 export interface Changeable {
     /** Whether the object value changed or not */
-    changed: KnockoutComputed<boolean>
+    changed: ko.Computed<boolean>
 }
 
 /** Utility function that converts a string to a date and checks that the value is different
@@ -52,7 +51,7 @@ export function hasObjectChanged<T extends Changeable, V>(value: T, original: V)
 }
 
 /** Checks if an array of Changeable has changed */
-export function hasArrayOfObjectsChanged<T extends Changeable,V>(value: KnockoutObservableArray<T>, original: V[]) {
+export function hasArrayOfObjectsChanged<T extends Changeable,V>(value: ko.ObservableArray<T>, original: V[]) {
     if (value == null)
         return original != null;
     if (original == null)
@@ -61,7 +60,7 @@ export function hasArrayOfObjectsChanged<T extends Changeable,V>(value: Knockout
 }
 
 /** Checks if an array of values has changed */
-export function hasArrayChanged<T>(value: KnockoutObservableArray<T>, original: T[]) {
+export function hasArrayChanged<T>(value: ko.ObservableArray<T>, original: T[]) {
     if (value == null)
         return original != null;
     if (original == null)
@@ -94,21 +93,21 @@ function hasErrorMessage(error: any): error is { errors: { errorMessage: string 
 }
 
 function parseErrors(error:ResponseError) {
-    if (!error.response) return promise.Promise.resolve(errorMessages.unknownError);
+    if (!error.response) return Promise.resolve(errorMessages.unknownError);
     
     switch (error.response.status) {
         case 401:
-            return promise.Promise.resolve(errorMessages.unauthorized);
+            return Promise.resolve(errorMessages.unauthorized);
         case 404:
-            return promise.Promise.resolve(errorMessages.notFound);
+            return Promise.resolve(errorMessages.notFound);
         case 500:
-            return promise.Promise.resolve(errorMessages.internalServerError);
+            return Promise.resolve(errorMessages.internalServerError);
         default:
-            if (!error.response.json) return promise.Promise.resolve(errorMessages.unknownError);
+            if (!error.response.json) return Promise.resolve(errorMessages.unknownError);
             
             return error.response.json<MvcErrors|string>().then(value => {
                 if (typeof value === "string") {
-                    return promise.Promise.resolve(value);
+                    return Promise.resolve(value);
                 }
                 else {
                     return new Promise<string>((resolve, reject) => {

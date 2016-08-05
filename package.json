@@ -1,15 +1,28 @@
 {
   "name": "folke-ko-service-helpers",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Helpers to call services",
-  "main": "folke-ko-service-helpers.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "tsc folke-ko-service-helpers.ts typings/tsd.d.ts --module amd"
+    "prepublish": "typings install && tsc -p ."
   },
   "author": "Sidoine De Wispelaere",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
-    "typescript": "*"
-  }
+    "typescript": "*",
+    "typings": "^1.3.2"
+  },
+  "dependencies": {
+    "knockout": "^3.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/folkelib/folke-ko-service-helpers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/folkelib/folke-ko-service-helpers/issues"
+  },
+  "homepage": "https://github.com/folkelib/folke-ko-service-helpers#readme"
 }
