@@ -152,11 +152,13 @@ export function getQueryString(parameters?: { [key: string]: any }) {
 /** True if there is any loading in progress */
 export var loading = ko.observable(false);
 
+export type Data = ArrayBuffer | ArrayBufferView | Blob | FormData | string;
+
 /** A private method called by the fetch methods. Creates a ResponseError
  * if the response has a status code that is not in the 200-300 range and
  * sets/unsets the loading boolean.
  */
-function fetchCommon(url: string, method: string, data: any): Promise<Response> {
+function fetchCommon(url: string, method: string, data: Data): Promise<Response> {
     var requestInit: RequestInit = {
         method: method,
         credentials: 'same-origin',
@@ -184,26 +186,26 @@ function fetchCommon(url: string, method: string, data: any): Promise<Response> 
 }
 
 /** Fetches an url that returns nothing */
-export function fetchVoid(url: string, method: string, data: any) {
+export function fetchVoid(url: string, method: string, data: Data) {
     return fetchCommon(url, method, data);
 }
 
 /** Fetches an url that returns one value */
-export function fetchSingle<TD>(url: string, method: string, data: any) {
+export function fetchSingle<TD>(url: string, method: string, data: Data) {
     return fetchCommon(url, method, data).then(response => response.json<TD>());
 }
 
 /** Fetches an url that returns an array of values */
-export function fetchList<TD>(url: string, method: string, data: any) {
+export function fetchList<TD>(url: string, method: string, data: Data) {
     return fetchCommon(url, method, data).then(response => response.json<TD[]>());
 }
 
 /** Fetches an url that returns one value and apply a factory to it */
-export function fetchSingleT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: any) {
+export function fetchSingleT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data) {
     return fetchCommon(url, method, data).then(response => response.json<TD>().then(result => factory(result)));
 }
 
 /** Fetches an url that returns an array of values and apply a factory on the response */
-export function fetchListT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: any) {
+export function fetchListT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data) {
     return fetchCommon(url, method, data).then(response =>response.json<TD[]>().then(result => result.map(item => factory(item))));
 }

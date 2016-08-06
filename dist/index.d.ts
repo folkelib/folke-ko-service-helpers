@@ -38,13 +38,14 @@ export declare function getQueryString(parameters?: {
 }): string;
 /** True if there is any loading in progress */
 export declare var loading: ko.Observable<boolean>;
+export declare type Data = ArrayBuffer | ArrayBufferView | Blob | FormData | string;
 /** Fetches an url that returns nothing */
-export declare function fetchVoid(url: string, method: string, data: any): Promise<Response>;
+export declare function fetchVoid(url: string, method: string, data: Data): Promise<Response>;
 /** Fetches an url that returns one value */
-export declare function fetchSingle<TD>(url: string, method: string, data: any): Promise<TD>;
+export declare function fetchSingle<TD>(url: string, method: string, data: Data): Promise<TD>;
 /** Fetches an url that returns an array of values */
-export declare function fetchList<TD>(url: string, method: string, data: any): Promise<TD[]>;
+export declare function fetchList<TD>(url: string, method: string, data: Data): Promise<TD[]>;
 /** Fetches an url that returns one value and apply a factory to it */
-export declare function fetchSingleT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: any): Promise<TR>;
+export declare function fetchSingleT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data): Promise<TR>;
 /** Fetches an url that returns an array of values and apply a factory on the response */
-export declare function fetchListT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: any): Promise<TR[]>;
+export declare function fetchListT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data): Promise<TR[]>;
