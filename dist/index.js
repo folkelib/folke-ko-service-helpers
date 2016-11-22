@@ -73,7 +73,7 @@ exports.showError = function (error) { return console.error(error); };
 var ResponseError = (function (_super) {
     __extends(ResponseError, _super);
     function ResponseError(message) {
-        _super.call(this, message);
+        return _super.call(this, message) || this;
     }
     return ResponseError;
 }(Error));
@@ -152,7 +152,7 @@ function fetchCommon(url, method, data) {
         },
     };
     exports.loading(true);
-    if (data != null)
+    if (data != undefined)
         requestInit.body = data;
     return window.fetch(url, requestInit).then(function (response) {
         exports.loading(false);

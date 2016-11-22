@@ -24,7 +24,7 @@ export var errorMessages ={
 /** An object whose value may have changed since an initial value */
 export interface Changeable {
     /** Whether the object value changed or not */
-    changed: ko.Computed<boolean>
+    changed: KnockoutComputed<boolean>
 }
 
 /** Utility function that converts a string to a date and checks that the value is different
@@ -51,7 +51,7 @@ export function hasObjectChanged<T extends Changeable, V>(value: T, original: V)
 }
 
 /** Checks if an array of Changeable has changed */
-export function hasArrayOfObjectsChanged<T extends Changeable,V>(value: ko.ObservableArray<T>, original: V[]) {
+export function hasArrayOfObjectsChanged<T extends Changeable,V>(value: KnockoutObservableArray<T>, original: V[]) {
     if (value == null)
         return original != null;
     if (original == null)
@@ -60,7 +60,7 @@ export function hasArrayOfObjectsChanged<T extends Changeable,V>(value: ko.Obser
 }
 
 /** Checks if an array of values has changed */
-export function hasArrayChanged<T>(value: ko.ObservableArray<T>, original: T[]) {
+export function hasArrayChanged<T>(value: KnockoutObservableArray<T>, original: T[]) {
     if (value == null)
         return original != null;
     if (original == null)
@@ -81,14 +81,17 @@ export class ResponseError extends Error {
     }
 }
 
-interface MvcErrors{
-    "": { errors: {
+interface MvcErrorMessages {
+    errors: {
         errorMessage: string;
     }[]
-    } | string[]
 }
 
-function hasErrorMessage(error: any): error is { errors: { errorMessage: string }[] }{
+interface MvcErrors{
+    "": MvcErrorMessages | string[]
+}
+
+function hasErrorMessage(error: any): error is MvcErrorMessages {
     return error.errors !== undefined;
 }
 
@@ -105,7 +108,7 @@ function parseErrors(error:ResponseError) {
         default:
             if (!error.response.json) return Promise.resolve(errorMessages.unknownError);
             
-            return error.response.json<MvcErrors|string>().then(value => {
+            return (<Promise<MvcErrors|string>>error.response.json()).then(value => {
                 if (typeof value === "string") {
                     return Promise.resolve(value);
                 }
@@ -120,14 +123,14 @@ function parseErrors(error:ResponseError) {
                             resolve(v.join("\n"));
                         }
                     });
-                }
+                } 
             });
     }
 }
 
 /** Creates a guery string from a list of parameters. Starts with a ? */
 export function getQueryString(parameters?: { [key: string]: any }) {
-    var parametersList = [];
+    var parametersList:string[] = [];
 
     if (parameters) {
         for (var key in parameters) {
@@ -152,7 +155,7 @@ export function getQueryString(parameters?: { [key: string]: any }) {
 /** True if there is any loading in progress */
 export var loading = ko.observable(false);
 
-export type Data = ArrayBuffer | ArrayBufferView | Blob | FormData | string;
+export type Data = ArrayBuffer | ArrayBufferView | Blob | FormData | string | undefined;
 
 /** A private method called by the fetch methods. Creates a ResponseError
  * if the response has a status code that is not in the 200-300 range and
@@ -168,7 +171,7 @@ function fetchCommon(url: string, method: string, data: Data): Promise<Response>
         },
     };
     loading(true);
-    if (data != null) requestInit.body = data;
+    if (data != undefined) requestInit.body = data;
     return window.fetch(url, requestInit).then(response => {
         loading(false);
         if (response.status >= 300 || response.status < 200) {
@@ -192,20 +195,20 @@ export function fetchVoid(url: string, method: string, data: Data) {
 
 /** Fetches an url that returns one value */
 export function fetchSingle<TD>(url: string, method: string, data: Data) {
-    return fetchCommon(url, method, data).then(response => response.json<TD>());
+    return fetchCommon(url, method, data).then(response => <Promise<TD>>response.json());
 }
 
 /** Fetches an url that returns an array of values */
 export function fetchList<TD>(url: string, method: string, data: Data) {
-    return fetchCommon(url, method, data).then(response => response.json<TD[]>());
+    return fetchCommon(url, method, data).then(response => <Promise<TD[]>>response.json());
 }
 
 /** Fetches an url that returns one value and apply a factory to it */
 export function fetchSingleT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data) {
-    return fetchCommon(url, method, data).then(response => response.json<TD>().then(result => factory(result)));
+    return fetchCommon(url, method, data).then(response => <Promise<TD>>response.json().then(result => factory(result)));
 }
 
 /** Fetches an url that returns an array of values and apply a factory on the response */
 export function fetchListT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data) {
-    return fetchCommon(url, method, data).then(response =>response.json<TD[]>().then(result => result.map(item => factory(item))));
+    return fetchCommon(url, method, data).then(response =>(<Promise<TD[]>>response.json()).then(result => result.map(item => factory(item))));
 }
