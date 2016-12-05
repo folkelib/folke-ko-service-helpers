@@ -186,11 +186,11 @@ function fetchList(url, method, data) {
 exports.fetchList = fetchList;
 /** Fetches an url that returns one value and apply a factory to it */
 function fetchSingleT(url, method, factory, data) {
-    return fetchCommon(url, method, data).then(function (response) { return response.json().then(function (result) { return factory(result); }); });
+    return fetchCommon(url, method, data).then(function (response) { return response.json(); }).then(function (result) { return factory(result); });
 }
 exports.fetchSingleT = fetchSingleT;
 /** Fetches an url that returns an array of values and apply a factory on the response */
 function fetchListT(url, method, factory, data) {
-    return fetchCommon(url, method, data).then(function (response) { return response.json().then(function (result) { return result.map(function (item) { return factory(item); }); }); });
+    return fetchCommon(url, method, data).then(function (response) { return response.json(); }).then(function (result) { return result.map(function (item) { return factory(item); }); });
 }
 exports.fetchListT = fetchListT;

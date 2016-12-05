@@ -47,6 +47,6 @@ export declare function fetchSingle<TD>(url: string, method: string, data: Data)
 /** Fetches an url that returns an array of values */
 export declare function fetchList<TD>(url: string, method: string, data: Data): Promise<TD[]>;
 /** Fetches an url that returns one value and apply a factory to it */
-export declare function fetchSingleT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data): Promise<TD>;
+export declare function fetchSingleT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data): Promise<TR>;
 /** Fetches an url that returns an array of values and apply a factory on the response */
 export declare function fetchListT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data): Promise<TR[]>;

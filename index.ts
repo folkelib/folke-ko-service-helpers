@@ -205,10 +205,10 @@ export function fetchList<TD>(url: string, method: string, data: Data) {
 
 /** Fetches an url that returns one value and apply a factory to it */
 export function fetchSingleT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data) {
-    return fetchCommon(url, method, data).then(response => <Promise<TD>>response.json().then(result => factory(result)));
+    return fetchCommon(url, method, data).then(response => <Promise<TD>>response.json()).then(result => factory(result));
 }
 
 /** Fetches an url that returns an array of values and apply a factory on the response */
 export function fetchListT<TD, TR>(url: string, method: string, factory: (data: TD) => TR, data: Data) {
-    return fetchCommon(url, method, data).then(response =>(<Promise<TD[]>>response.json()).then(result => result.map(item => factory(item))));
+    return fetchCommon(url, method, data).then(response =>(<Promise<TD[]>>response.json())).then(result => result.map(item => factory(item)));
 }
