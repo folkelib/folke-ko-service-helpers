@@ -1,5 +1,4 @@
 /// <reference types="knockout" />
-/// <reference types="whatwg-fetch" />
 export declare var errorMessages: {
     unauthorized: string;
     internalServerError: string;

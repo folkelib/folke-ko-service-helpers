@@ -12,11 +12,17 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
 OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.*/
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var ko = require("knockout");
 exports.errorMessages = {
     unauthorized: "Unauthorized access",
@@ -82,8 +88,9 @@ function hasErrorMessage(error) {
     return error.errors !== undefined;
 }
 function parseErrors(error) {
-    if (!error.response)
+    if (!error.response) {
         return Promise.resolve(exports.errorMessages.unknownError);
+    }
     switch (error.response.status) {
         case 401:
             return Promise.resolve(exports.errorMessages.unauthorized);
@@ -92,8 +99,9 @@ function parseErrors(error) {
         case 500:
             return Promise.resolve(exports.errorMessages.internalServerError);
         default:
-            if (!error.response.json)
+            if (!error.response.json) {
                 return Promise.resolve(exports.errorMessages.unknownError);
+            }
             return error.response.json().then(function (value) {
                 if (typeof value === "string") {
                     return Promise.resolve(value);

@@ -14,7 +14,7 @@ CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.*/
 
 import * as ko from "knockout";
 
-export var errorMessages ={
+export var errorMessages = {
     unauthorized: "Unauthorized access",
     internalServerError: "Internal server error",
     notFound: "Resource not found",
@@ -87,8 +87,8 @@ interface MvcErrorMessages {
     }[]
 }
 
-interface MvcErrors{
-    "": MvcErrorMessages | string[]
+interface MvcErrors {
+    [key:string]: MvcErrorMessages | string[];
 }
 
 function hasErrorMessage(error: any): error is MvcErrorMessages {
@@ -96,8 +96,10 @@ function hasErrorMessage(error: any): error is MvcErrorMessages {
 }
 
 function parseErrors(error:ResponseError) {
-    if (!error.response) return Promise.resolve(errorMessages.unknownError);
-    
+    if (!error.response) {
+        return Promise.resolve(errorMessages.unknownError);
+    }
+
     switch (error.response.status) {
         case 401:
             return Promise.resolve(errorMessages.unauthorized);
@@ -106,15 +108,17 @@ function parseErrors(error:ResponseError) {
         case 500:
             return Promise.resolve(errorMessages.internalServerError);
         default:
-            if (!error.response.json) return Promise.resolve(errorMessages.unknownError);
-            
+            if (!error.response.json) {
+                return Promise.resolve(errorMessages.unknownError);
+            }
+
             return (<Promise<MvcErrors|string>>error.response.json()).then(value => {
                 if (typeof value === "string") {
                     return Promise.resolve(value);
                 }
                 else {
                     return new Promise<string>((resolve, reject) => {
-                        var v = value[""];
+                        const v = value[""];
                         if (hasErrorMessage(v)) {
                             var errors = v.errors.map(x => x.errorMessage).join("\n");
                             resolve(errors);

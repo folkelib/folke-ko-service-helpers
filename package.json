@@ -11,7 +11,7 @@
   "author": "Sidoine De Wispelaere",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "~2.1"
+    "typescript": "~2.2.2"
   },
   "dependencies": {
     "knockout": "^3.4.0",
