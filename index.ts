@@ -71,7 +71,7 @@ export function hasArrayChanged<T>(value: KnockoutObservableArray<T>, original: 
 /** Called each time there is an error message to show. You should replace
  * this with your own function.
  */
-export var showError = (error:string) => console.error(error);
+export var showError = (error:string, field?:string) => console.error(error);
 
 /** An error with the response that caused this error */
 export class ResponseError extends Error {
@@ -88,7 +88,7 @@ interface MvcErrorMessages {
 }
 
 interface MvcErrors {
-    [key:string]: MvcErrorMessages | string[];
+    [key:string]: string[];
 }
 
 function hasErrorMessage(error: any): error is MvcErrorMessages {
@@ -97,38 +97,38 @@ function hasErrorMessage(error: any): error is MvcErrorMessages {
 
 function parseErrors(error:ResponseError) {
     if (!error.response) {
-        return Promise.resolve(errorMessages.unknownError);
+        return showError(errorMessages.unknownError);
     }
 
     switch (error.response.status) {
         case 401:
-            return Promise.resolve(errorMessages.unauthorized);
+            showError(errorMessages.unauthorized);
+            break;
         case 404:
-            return Promise.resolve(errorMessages.notFound);
+            showError(errorMessages.notFound);
+            break;
         case 500:
-            return Promise.resolve(errorMessages.internalServerError);
+            showError(errorMessages.internalServerError);
+            break;
         default:
             if (!error.response.json) {
-                return Promise.resolve(errorMessages.unknownError);
+                showError(errorMessages.unknownError);
             }
-
-            return (<Promise<MvcErrors|string>>error.response.json()).then(value => {
-                if (typeof value === "string") {
-                    return Promise.resolve(value);
-                }
-                else {
-                    return new Promise<string>((resolve, reject) => {
-                        const v = value[""];
-                        if (hasErrorMessage(v)) {
-                            var errors = v.errors.map(x => x.errorMessage).join("\n");
-                            resolve(errors);
-                        }
-                        else {
-                            resolve(v.join("\n"));
-                        }
-                    });
-                } 
-            });
+            else {
+                error.response.json().then((value:string|MvcErrors) => {
+                    if (typeof value === "string") {
+                        showError(value);
+                    }
+                    else {
+                        for (let field in value) {
+                            for (let error of value[field]){
+                                showError(error, field);
+                            }                            
+                        }                        
+                    } 
+                });
+            }
+            break;
     }
 }
 
@@ -181,13 +181,13 @@ function fetchCommon(url: string, method: string, data: Data): Promise<Response>
         if (response.status >= 300 || response.status < 200) {
             var error = new ResponseError(response.statusText);
             error.response = response;
-            parseErrors(error).then(showError);
+            parseErrors(error);
             throw error;
         }
         return response;
     }, (error:ResponseError) => {
         loading(false);
-        parseErrors(error).then(showError);
+        parseErrors(error);
         throw error;
     });
 }

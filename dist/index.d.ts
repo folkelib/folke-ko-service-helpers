@@ -26,7 +26,7 @@ export declare function hasArrayChanged<T>(value: KnockoutObservableArray<T>, or
 /** Called each time there is an error message to show. You should replace
  * this with your own function.
  */
-export declare var showError: (error: string) => void;
+export declare var showError: (error: string, field?: string | undefined) => void;
 /** An error with the response that caused this error */
 export declare class ResponseError extends Error {
     response: Response;

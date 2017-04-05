@@ -74,7 +74,7 @@ exports.hasArrayChanged = hasArrayChanged;
 /** Called each time there is an error message to show. You should replace
  * this with your own function.
  */
-exports.showError = function (error) { return console.error(error); };
+exports.showError = function (error, field) { return console.error(error); };
 /** An error with the response that caused this error */
 var ResponseError = (function (_super) {
     __extends(ResponseError, _super);
@@ -89,36 +89,38 @@ function hasErrorMessage(error) {
 }
 function parseErrors(error) {
     if (!error.response) {
-        return Promise.resolve(exports.errorMessages.unknownError);
+        return exports.showError(exports.errorMessages.unknownError);
     }
     switch (error.response.status) {
         case 401:
-            return Promise.resolve(exports.errorMessages.unauthorized);
+            exports.showError(exports.errorMessages.unauthorized);
+            break;
         case 404:
-            return Promise.resolve(exports.errorMessages.notFound);
+            exports.showError(exports.errorMessages.notFound);
+            break;
         case 500:
-            return Promise.resolve(exports.errorMessages.internalServerError);
+            exports.showError(exports.errorMessages.internalServerError);
+            break;
         default:
             if (!error.response.json) {
-                return Promise.resolve(exports.errorMessages.unknownError);
+                exports.showError(exports.errorMessages.unknownError);
             }
-            return error.response.json().then(function (value) {
-                if (typeof value === "string") {
-                    return Promise.resolve(value);
-                }
-                else {
-                    return new Promise(function (resolve, reject) {
-                        var v = value[""];
-                        if (hasErrorMessage(v)) {
-                            var errors = v.errors.map(function (x) { return x.errorMessage; }).join("\n");
-                            resolve(errors);
+            else {
+                error.response.json().then(function (value) {
+                    if (typeof value === "string") {
+                        exports.showError(value);
+                    }
+                    else {
+                        for (var field in value) {
+                            for (var _i = 0, _a = value[field]; _i < _a.length; _i++) {
+                                var error_1 = _a[_i];
+                                exports.showError(error_1, field);
+                            }
                         }
-                        else {
-                            resolve(v.join("\n"));
-                        }
-                    });
-                }
-            });
+                    }
+                });
+            }
+            break;
     }
 }
 /** Creates a guery string from a list of parameters. Starts with a ? */
@@ -167,13 +169,13 @@ function fetchCommon(url, method, data) {
         if (response.status >= 300 || response.status < 200) {
             var error = new ResponseError(response.statusText);
             error.response = response;
-            parseErrors(error).then(exports.showError);
+            parseErrors(error);
             throw error;
         }
         return response;
     }, function (error) {
         exports.loading(false);
-        parseErrors(error).then(exports.showError);
+        parseErrors(error);
         throw error;
     });
 }
