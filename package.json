@@ -6,7 +6,8 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "tsc -p ."
+    "prepare": "tsc -p .",
+    "watch": "tsc -w"
   },
   "author": "Sidoine De Wispelaere",
   "license": "MIT",

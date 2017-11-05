@@ -166,13 +166,13 @@ export type Data = ArrayBuffer | ArrayBufferView | Blob | FormData | string | un
  * sets/unsets the loading boolean.
  */
 function fetchCommon(url: string, method: string, data: Data): Promise<Response> {
+    const headers = new Headers();
+    headers.append("Accept", "application/json");
+    headers.append('Content-Type', 'application/json');
     var requestInit: RequestInit = {
         method: method,
         credentials: 'same-origin',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
+        headers: headers
     };
     loading(true);
     if (data != undefined) requestInit.body = data;

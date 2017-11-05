@@ -1,3 +1,4 @@
+"use strict";
 /*Copyright (C) 2015 Sidoine De Wispelaere
 
 Permission to use, copy, modify, and/or distribute this software for any
@@ -11,7 +12,6 @@ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
 OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.*/
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -76,7 +76,7 @@ exports.hasArrayChanged = hasArrayChanged;
  */
 exports.showError = function (error, field) { return console.error(error); };
 /** An error with the response that caused this error */
-var ResponseError = (function (_super) {
+var ResponseError = /** @class */ (function (_super) {
     __extends(ResponseError, _super);
     function ResponseError(message) {
         return _super.call(this, message) || this;
@@ -153,13 +153,13 @@ exports.loading = ko.observable(false);
  * sets/unsets the loading boolean.
  */
 function fetchCommon(url, method, data) {
+    var headers = new Headers();
+    headers.append("Accept", "application/json");
+    headers.append('Content-Type', 'application/json');
     var requestInit = {
         method: method,
         credentials: 'same-origin',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
+        headers: headers
     };
     exports.loading(true);
     if (data != undefined)
