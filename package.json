@@ -6,16 +6,16 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "tsc -p ."
+    "prepare": "tsc -p ."
   },
   "author": "Sidoine De Wispelaere",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "~2.2.2"
+    "typescript": "^2.6.1"
   },
   "dependencies": {
     "knockout": "^3.4.0",
-    "@types/knockout": "~3.4.36"
+    "@types/knockout": "^3.4.46"
   },
   "repository": {
     "type": "git",
