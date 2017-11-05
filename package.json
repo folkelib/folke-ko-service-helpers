@@ -1,6 +1,6 @@
 {
   "name": "folke-ko-service-helpers",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Helpers to call services",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
