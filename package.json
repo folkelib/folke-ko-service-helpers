@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "knockout": "^3.4.0",
-    "@types/knockout": "^3.4.46"
+    "@types/knockout": "^3.4.46",
+    "folke-service-helpers": "^1.0"
   },
   "repository": {
     "type": "git",
